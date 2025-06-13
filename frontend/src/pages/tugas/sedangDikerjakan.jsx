@@ -5,19 +5,64 @@ import { Link } from "react-router-dom";
 
 export default function SedangDikerjakan() {
   const [tasks, setTasks] = useState([]);
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [showCompleteAlert, setShowCompleteAlert] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
   const navigate = useNavigate();
 
   const handleEdit = (taskId) => {
     navigate(`/editTugas/${taskId}`);
   };
 
+  // Modify handleCompleteTask to show alert first
   const handleCompleteTask = (taskId) => {
+    setSelectedTaskId(taskId);
+    setShowCompleteAlert(true);
+  };
+
+  useEffect(() => {
+    const savedTasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+    const sedangDikerjakanTasks = savedTasks.filter(
+      (task) => task.status === "Sedang Dikerjakan"
+    );
+    setTasks(sedangDikerjakanTasks);
+  }, []);
+
+  // Modify handleDelete to show alert first
+  const handleDelete = (taskId) => {
+    setSelectedTaskId(taskId);
+    setShowDeleteAlert(true);
+  };
+
+  // Add actual delete function
+  const confirmDelete = () => {
+    const savedTasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+    const updatedTasks = savedTasks.filter(
+      (task) => task.id !== selectedTaskId
+    );
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+
+    // Update task statistics
+    let taskStats = JSON.parse(localStorage.getItem("taskStats") || "{}");
+    taskStats.sedangDikerjakan = Math.max(
+      0,
+      (taskStats.sedangDikerjakan || 0) - 1
+    );
+    localStorage.setItem("taskStats", JSON.stringify(taskStats));
+
+    // Update UI
+    setTasks(tasks.filter((task) => task.id !== selectedTaskId));
+    setShowDeleteAlert(false);
+    window.dispatchEvent(new Event("tasksUpdated"));
+  };
+
+  // Add actual complete function
+  const confirmComplete = () => {
     const savedTasks = JSON.parse(localStorage.getItem("tasks") || "[]");
     const updatedTasks = savedTasks.map((task) =>
-      task.id === taskId ? { ...task, status: "Selesai" } : task
+      task.id === selectedTaskId ? { ...task, status: "Selesai" } : task
     );
 
-    // Update localStorage
     localStorage.setItem("tasks", JSON.stringify(updatedTasks));
 
     // Update task statistics
@@ -30,40 +75,15 @@ export default function SedangDikerjakan() {
     localStorage.setItem("taskStats", JSON.stringify(taskStats));
 
     // Update UI
-    setTasks(tasks.filter((task) => task.id !== taskId));
-  };
-
-  useEffect(() => {
-    const savedTasks = JSON.parse(localStorage.getItem("tasks") || "[]");
-    const sedangDikerjakanTasks = savedTasks.filter(
-      (task) => task.status === "Sedang Dikerjakan"
-    );
-    setTasks(sedangDikerjakanTasks);
-  }, []);
-
-  const handleDelete = (taskId) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus tugas ini?")) {
-      const savedTasks = JSON.parse(localStorage.getItem("tasks") || "[]");
-      const updatedTasks = savedTasks.filter((task) => task.id !== taskId);
-      localStorage.setItem("tasks", JSON.stringify(updatedTasks));
-
-      // Update task statistics
-      let taskStats = JSON.parse(localStorage.getItem("taskStats") || "{}");
-      taskStats.sedangDikerjakan = Math.max(
-        0,
-        (taskStats.sedangDikerjakan || 0) - 1
-      );
-      localStorage.setItem("taskStats", JSON.stringify(taskStats));
-
-      // Update UI
-      setTasks(tasks.filter((task) => task.id !== taskId));
-    }
+    setTasks(tasks.filter((task) => task.id !== selectedTaskId));
+    setShowCompleteAlert(false);
+    window.dispatchEvent(new Event("tasksUpdated"));
   };
 
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <nav className="flex mb-8" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 md:space-x-3">
@@ -176,6 +196,106 @@ export default function SedangDikerjakan() {
               </div>
             )}
           </div>
+
+          {/* Delete Alert */}
+          {showDeleteAlert && (
+            <>
+              <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm z-40"></div>
+              <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-96 bg-white border border-red-200 rounded-xl shadow-lg overflow-hidden z-50">
+                <div className="p-4">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <svg
+                        className="h-6 w-6 text-red-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                        />
+                      </svg>
+                    </div>
+                    <div className="ml-3 w-0 flex-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        Hapus Tugas
+                      </p>
+                      <p className="mt-1 text-sm text-gray-500">
+                        Apakah Anda yakin ingin menghapus tugas ini?
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex justify-end gap-2">
+                    <button
+                      onClick={() => setShowDeleteAlert(false)}
+                      className="px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 rounded"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      onClick={confirmDelete}
+                      className="px-3 py-1 text-sm text-white bg-red-600 hover:bg-red-700 rounded"
+                    >
+                      Hapus
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Complete Task Alert */}
+          {showCompleteAlert && (
+            <>
+              <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm z-40"></div>
+              <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-96 bg-white border border-green-200 rounded-xl shadow-lg overflow-hidden z-50">
+                <div className="p-4">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <svg
+                        className="h-6 w-6 text-green-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </div>
+                    <div className="ml-3 w-0 flex-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        Selesaikan Tugas
+                      </p>
+                      <p className="mt-1 text-sm text-gray-500">
+                        Apakah Anda yakin telah menyelesaikan tugas ini?
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex justify-end gap-2">
+                    <button
+                      onClick={() => setShowCompleteAlert(false)}
+                      className="px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 rounded"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      onClick={confirmComplete}
+                      className="px-3 py-1 text-sm text-white bg-green-600 hover:bg-green-700 rounded"
+                    >
+                      Selesai
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </>

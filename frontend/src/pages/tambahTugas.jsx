@@ -7,6 +7,7 @@ export default function TambahTugas() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [deadline, setDeadline] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
@@ -45,15 +46,19 @@ export default function TambahTugas() {
     tasks.push(newTask);
     localStorage.setItem("tasks", JSON.stringify(tasks));
 
-    console.log("Tugas disimpan:", newTask);
-    // Kembali ke dashboard setelah menyimpan
-    navigate("/dashboard");
+    // Tampilkan alert
+    setShowAlert(true);
+
+    // Redirect ke dashboard setelah 2 detik
+    setTimeout(() => {
+      navigate("/dashboard");
+    }, 2000);
   };
 
   return (
     <>
       <Navbar />
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <nav className="flex mb-8" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 md:space-x-3">
@@ -189,6 +194,65 @@ export default function TambahTugas() {
                 Simpan Tugas
               </button>
             </div>
+
+            {/* Success Alert */}
+            {showAlert && (
+              <>
+                {/* Backdrop with blur */}
+                <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm z-40"></div>
+
+                {/* Centered Alert */}
+                <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-96 bg-white border border-green-200 rounded-xl shadow-lg overflow-hidden z-50">
+                  <div className="p-4">
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0">
+                        <svg
+                          className="h-6 w-6 text-green-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth="1.5"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                      </div>
+                      <div className="ml-3 w-0 flex-1">
+                        <p className="text-sm font-medium text-gray-900">
+                          Tugas Berhasil Ditambahkan!
+                        </p>
+                        <p className="mt-1 text-sm text-gray-500">
+                          Anda akan dialihkan ke halaman dashboard dalam
+                          beberapa detik.
+                        </p>
+                      </div>
+                      <div className="ml-4 flex flex-shrink-0">
+                        <button
+                          onClick={() => setShowAlert(false)}
+                          className="inline-flex text-gray-400 hover:text-gray-500"
+                        >
+                          <span className="sr-only">Close</span>
+                          <svg
+                            className="h-5 w-5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </form>
         </div>
       </div>

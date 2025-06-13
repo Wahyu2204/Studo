@@ -26,9 +26,56 @@ export default function MainContent() {
 
   const navigate = useNavigate();
 
+  // Tambahkan useEffect baru untuk menghitung ulang statistik
+  useEffect(() => {
+    const calculateTaskStats = () => {
+      const tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+
+      // Hitung jumlah tugas untuk setiap kategori
+      const stats = {
+        selesai: tasks.filter((task) => task.status === "Selesai").length,
+        sedangDikerjakan: tasks.filter(
+          (task) => task.status === "Sedang Dikerjakan"
+        ).length,
+        belumDikerjakan: tasks.filter(
+          (task) => task.status === "Belum Dikerjakan"
+        ).length,
+        tidakDikerjakan: tasks.filter(
+          (task) => task.status === "Tidak Dikerjakan"
+        ).length,
+      };
+
+      // Update localStorage dan state
+      localStorage.setItem("taskStats", JSON.stringify(stats));
+      setTaskStats(stats);
+    };
+
+    // Panggil fungsi saat komponen dimuat
+    calculateTaskStats();
+
+    // Tambah event listener untuk update
+    window.addEventListener("tasksUpdated", calculateTaskStats);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener("tasksUpdated", calculateTaskStats);
+    };
+  }, []);
+
+  // Add this function after the useEffect hook
+  const calculatePercentage = (value) => {
+    const total =
+      taskStats.selesai +
+      taskStats.sedangDikerjakan +
+      taskStats.belumDikerjakan +
+      taskStats.tidakDikerjakan;
+    if (total === 0) return 0;
+    return Math.round((value / total) * 100);
+  };
+
   return (
     <main>
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <nav className="flex mb-8" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 md:space-x-3">
@@ -115,7 +162,7 @@ export default function MainContent() {
             <div className="mt-4 h-2.5 w-full rounded-full bg-green-100 overflow-hidden">
               <div
                 className="h-2.5 rounded-full bg-green-500 transition-all duration-500"
-                style={{ width: "75%" }}
+                style={{ width: `${calculatePercentage(taskStats.selesai)}%` }}
               ></div>
             </div>
             <button
@@ -167,7 +214,9 @@ export default function MainContent() {
             <div className="mt-4 h-2.5 w-full rounded-full bg-blue-100 overflow-hidden">
               <div
                 className="h-2.5 rounded-full bg-blue-500 transition-all duration-500"
-                style={{ width: "50%" }}
+                style={{
+                  width: `${calculatePercentage(taskStats.sedangDikerjakan)}%`,
+                }}
               ></div>
             </div>
             <button
@@ -219,7 +268,9 @@ export default function MainContent() {
             <div className="mt-4 h-2.5 w-full rounded-full bg-yellow-100 overflow-hidden">
               <div
                 className="h-2.5 rounded-full bg-yellow-500 transition-all duration-500"
-                style={{ width: "25%" }}
+                style={{
+                  width: `${calculatePercentage(taskStats.belumDikerjakan)}%`,
+                }}
               ></div>
             </div>
             <button
@@ -271,7 +322,9 @@ export default function MainContent() {
             <div className="mt-4 h-2.5 w-full rounded-full bg-red-100 overflow-hidden">
               <div
                 className="h-2.5 rounded-full bg-red-500 transition-all duration-500"
-                style={{ width: "10%" }}
+                style={{
+                  width: `${calculatePercentage(taskStats.tidakDikerjakan)}%`,
+                }}
               ></div>
             </div>
             <button

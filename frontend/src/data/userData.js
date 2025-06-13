@@ -8,7 +8,6 @@ export const user = {
 export const navigation = [
   { name: "Dashboard", href: "/dashboard", current: false },
   { name: "Tambah Tugas", href: "/tambahTugas", current: false },
-  { name: "Tugas", href: "#", current: false },
 ];
 
 export const userNavigation = [
