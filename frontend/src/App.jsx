@@ -8,6 +8,7 @@ import Contact from "./pages/contact";
 
 // Interaksi
 import Login from "./pages/login";
+import Regis from "./pages/regis";
 
 // Dashboard
 import Dashboard from "./pages/dashboard";
@@ -29,6 +30,7 @@ export default function App() {
 
       {/* Interaksi */}
       <Route path="/login" element={<Login />} />
+      <Route path="/regis" element={<Regis />} />
 
       {/* Dashboard */}
       <Route path="/dashboard" element={<Dashboard />} />

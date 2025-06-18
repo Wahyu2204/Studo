@@ -159,7 +159,7 @@ export default function Login() {
             <p className="text-center text-sm text-gray-600">
               Don't have an account?{" "}
               <Link
-                to="/signup"
+                to="/regis"
                 className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors duration-200"
               >
                 Create an account
