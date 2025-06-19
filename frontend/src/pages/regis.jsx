@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 // We will use the Google Identity Services library directly from a CDN.
 
 export default function Signup() {
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -89,7 +89,7 @@ export default function Signup() {
     setIsLoading(true);
 
     // Replace this URL with the public IP address or DNS of your EC2 instance
-    const API_URL = "http://<YOUR_EC2_PUBLIC_IP_ADDRESS>:4000/api/register";
+    const API_URL = "http://localhost:4000/api/register";
 
     try {
       const response = await fetch(API_URL, {
@@ -97,7 +97,7 @@ export default function Signup() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ username, email, password }),
       });
 
       const data = await response.json();
@@ -107,8 +107,6 @@ export default function Signup() {
         throw new Error(data.message || "Failed to register.");
       }
 
-      // On successful registration
-      console.log("Registration successful:", data);
       // You could store a JWT token returned from the server here
       // localStorage.setItem('token', data.token);
       alert("Registration successful! Please login.");
@@ -172,12 +170,12 @@ export default function Signup() {
                 </label>
                 <div className="mt-1">
                   <input
-                    id="name"
-                    name="name"
+                    id="username"
+                    name="username"
                     type="text"
                     required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     className="block w-full rounded-lg border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 shadow-sm focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-shadow duration-200"
                     placeholder="Enter your full name"
                   />

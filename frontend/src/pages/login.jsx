@@ -1,33 +1,66 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
+import axios from "axios";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login attempted with:", { email, password });
-    if (email && password) {
-      console.log("Login email/password berhasil");
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const response = await axios.post("http://localhost:4000/api/login", {
+        email,
+        password,
+      });
+
+      // Simpan token dan data user
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
       localStorage.setItem("isAuthenticated", "true");
+
+      // Redirect ke dashboard
       navigate("/dashboard");
-    } else {
-      console.log("Login gagal: Email atau password kosong");
+    } catch (error) {
+      setError(
+        error.response?.data?.message || "An error occurred during login"
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleGoogleSuccess = (credentialResponse) => {
-    console.log("Login with Google berhasil:", credentialResponse);
-    // Simulasi keberhasilan tanpa backend
-    localStorage.setItem("isAuthenticated", "true");
-    navigate("/dashboard");
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      // Kirim token Google ke backend untuk verifikasi
+      const response = await axios.post(
+        "http://localhost:4000/api/google",
+        {
+          credential: credentialResponse.credential,
+        },
+        { withCredentials: true }
+      );
+
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+      localStorage.setItem("isAuthenticated", "true");
+
+      // setUser(response.data.user); // Set user in context (removed because setUser is not defined)
+      navigate("/dashboard");
+    } catch (error) {
+      setError(error.response?.data?.message || "Google login failed");
+    }
   };
 
-  const handleGoogleError = (error) => {
-    console.log("Login with Google gagal:", error);
+  const handleGoogleError = () => {
+    setError("Google login failed. Please try again.");
   };
 
   return (
@@ -73,6 +106,12 @@ export default function Login() {
           </div>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+            {error && (
+              <div className="p-3 text-sm text-red-500 bg-red-50 rounded-lg">
+                {error}
+              </div>
+            )}
+
             <div className="space-y-5">
               <div>
                 <label
@@ -131,9 +170,10 @@ export default function Login() {
             <div>
               <button
                 type="submit"
-                className="w-full rounded-lg bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-md hover:from-indigo-500 hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 transition-all duration-200"
+                disabled={isLoading}
+                className="w-full rounded-lg bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-md hover:from-indigo-500 hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Sign in
+                {isLoading ? "Signing in..." : "Sign in"}
               </button>
             </div>
 

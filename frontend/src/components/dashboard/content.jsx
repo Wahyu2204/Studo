@@ -6,6 +6,9 @@ import { Link } from "react-router-dom";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function MainContent() {
+  const [isLogin, setIsLogin] = useState(false);
+  const [username, setUsername] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [taskStats, setTaskStats] = useState({
     selesai: 0,
     sedangDikerjakan: 0,
@@ -60,6 +63,49 @@ export default function MainContent() {
     return () => {
       window.removeEventListener("tasksUpdated", calculateTaskStats);
     };
+  }, []);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        setIsLogin(true);
+        setIsLoading(true);
+
+        try {
+          const response = await fetch("http://localhost:4000/api/profile", {
+            // Ganti dengan URL API Anda
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          console.log("Status API:", response.status);
+          if (response.ok) {
+            const user = await response.json();
+            console.log("Data dari API:", user);
+            setUsername(user.data.username || "Tamu"); // Ubah ke user.data.nama
+          } else {
+            setUsername("Tamu");
+            if (response.status === 401) {
+              localStorage.removeItem("token");
+              setIsLogin(false);
+              window.location.href = "/login";
+            }
+          }
+        } catch (error) {
+          console.error("Error saat fetch:", error);
+          setUsername("Tamu");
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        console.log("Token tidak ditemukan");
+      }
+    };
+
+    fetchUserData();
   }, []);
 
   // Add this function after the useEffect hook
@@ -124,7 +170,11 @@ export default function MainContent() {
         {/* Enhanced Welcome Section */}
         <div className="text-center bg-gradient-to-r from-indigo-600 to-blue-500 rounded-2xl p-12 shadow-lg mb-12">
           <h1 className="text-5xl font-bold tracking-tight text-balance text-white sm:text-7xl">
-            Halo User
+            {isLogin
+              ? isLoading
+                ? "Memuat..."
+                : `Selamat datang, ${username}`
+              : "Sistem Manajemen Peminjaman Barang"}
           </h1>
           <p className="mt-8 text-lg font-medium text-pretty text-indigo-100 sm:text-xl/8 max-w-2xl mx-auto">
             Selamat datang di Studo dimana anda bisa mengelola tugas anda dengan

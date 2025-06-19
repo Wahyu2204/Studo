@@ -9,10 +9,10 @@ import {
 } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import {
-  user,
   navigation,
   userNavigation,
   classNames,
+  user,
 } from "../../data/userData";
 
 export default function Navbar() {
@@ -70,7 +70,7 @@ export default function Navbar() {
                     <span className="sr-only">Open user menu</span>
                     <img
                       alt=""
-                      src={user.imageUrl}
+                      src={user?.picture}
                       className="size-9 rounded-full border-2 border-gray-700"
                     />
                   </MenuButton>
@@ -135,16 +135,16 @@ export default function Navbar() {
             <div className="shrink-0">
               <img
                 alt=""
-                src={user.imageUrl}
+                src={user?.picture}
                 className="size-10 rounded-full border-2 border-gray-700"
               />
             </div>
             <div className="ml-3">
               <div className="text-base font-semibold text-white">
-                {user.name}
+                {user?.name}
               </div>
               <div className="text-sm font-medium text-gray-300">
-                {user.email}
+                {user?.email}
               </div>
             </div>
             <button
