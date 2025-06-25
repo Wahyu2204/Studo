@@ -36,7 +36,7 @@ export default function Signup() {
       // If it is, just initialize and render the button
       window.google.accounts.id.initialize({
         // Replace with your actual Google Cloud Client ID
-        client_id: "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com",
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
         callback: handleGoogleSuccess,
       });
       window.google.accounts.id.renderButton(
@@ -89,7 +89,7 @@ export default function Signup() {
     setIsLoading(true);
 
     // Replace this URL with the public IP address or DNS of your EC2 instance
-    const API_URL = "${process.env.API_URL}/register";
+    const API_URL = `${import.meta.env.VITE_API_URL}/register`;
 
     try {
       const response = await fetch(API_URL, {

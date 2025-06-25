@@ -16,10 +16,13 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post("${process.env.API_URL}/login", {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/login`,
+        {
+          email,
+          password,
+        }
+      );
 
       // Simpan token dan data user
       localStorage.setItem("token", response.data.token);
@@ -41,7 +44,7 @@ export default function Login() {
     try {
       // Kirim token Google ke backend untuk verifikasi
       const response = await axios.post(
-        "${process.env.API_URL}/google",
+        `${import.meta.env.VITE_API_URL}/google`,
         {
           credential: credentialResponse.credential,
         },

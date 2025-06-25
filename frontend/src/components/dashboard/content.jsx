@@ -73,13 +73,16 @@ export default function MainContent() {
         setIsLoading(true);
 
         try {
-          const response = await fetch("${process.env.API_URL}/profile", {
-            // Ganti dengan URL API Anda
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/profile`,
+            {
+              // Ganti dengan URL API Anda
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
 
           console.log("Status API:", response.status);
           if (response.ok) {
