@@ -73,7 +73,7 @@ export default function MainContent() {
         setIsLoading(true);
 
         try {
-          const response = await fetch("http://localhost:4000/api/profile", {
+          const response = await fetch("${process.env.API_URL}/profile", {
             // Ganti dengan URL API Anda
             method: "GET",
             headers: {

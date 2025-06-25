@@ -16,7 +16,7 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:4000/api/login", {
+      const response = await axios.post("${process.env.API_URL}/login", {
         email,
         password,
       });
@@ -41,7 +41,7 @@ export default function Login() {
     try {
       // Kirim token Google ke backend untuk verifikasi
       const response = await axios.post(
-        "http://localhost:4000/api/google",
+        "${process.env.API_URL}/google",
         {
           credential: credentialResponse.credential,
         },

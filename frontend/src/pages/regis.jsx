@@ -89,7 +89,7 @@ export default function Signup() {
     setIsLoading(true);
 
     // Replace this URL with the public IP address or DNS of your EC2 instance
-    const API_URL = "http://localhost:4000/api/register";
+    const API_URL = "${process.env.API_URL}/register";
 
     try {
       const response = await fetch(API_URL, {
