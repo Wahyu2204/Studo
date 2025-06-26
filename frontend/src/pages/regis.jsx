@@ -89,7 +89,7 @@ export default function Signup() {
     setIsLoading(true);
 
     // Replace this URL with the public IP address or DNS of your EC2 instance
-    const API_URL = `${import.meta.env.VITE_API_URL}/register`;
+    const API_URL = `${import.meta.env.VITE_API_URL}/api/register`;
 
     try {
       const response = await fetch(API_URL, {

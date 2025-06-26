@@ -17,7 +17,7 @@ export default function Login() {
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/login`,
+        `${import.meta.env.VITE_API_URL}/api/login`,
         {
           email,
           password,
@@ -44,7 +44,7 @@ export default function Login() {
     try {
       // Kirim token Google ke backend untuk verifikasi
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/google`,
+        `${import.meta.env.VITE_API_URL}/api/google`,
         {
           credential: credentialResponse.credential,
         },

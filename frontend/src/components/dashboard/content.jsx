@@ -74,7 +74,7 @@ export default function MainContent() {
 
         try {
           const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/profile`,
+            `${import.meta.env.VITE_API_URL}/api/profile`,
             {
               // Ganti dengan URL API Anda
               method: "GET",
