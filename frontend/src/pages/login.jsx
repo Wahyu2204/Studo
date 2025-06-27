@@ -195,7 +195,7 @@ export default function Login() {
               <GoogleLogin
                 onSuccess={handleGoogleSuccess}
                 onError={handleGoogleError}
-                className="w-full"
+                className="w-300"
               />
             </div>
 
